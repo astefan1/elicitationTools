@@ -1,0 +1,43 @@
+<script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
+<style>
+    #myCanvas{border:1px solid red;}
+</style>
+<script>
+    $(function(){
+
+        // canvas variables
+        var canvas=document.getElementById("myCanvas");
+        var ctx=canvas.getContext("2d");
+        var $canvas=$("#myCanvas"); //dollar sign = document.getElementByID
+        var canvasOffset=$canvas.offset();
+        var offsetX=canvasOffset.left;
+        var offsetY=canvasOffset.top;
+        var scrollX=$canvas.scrollLeft();
+        var scrollY=$canvas.scrollTop();
+
+        ctx.fillText('Click me!', 30, 30);
+
+        // called when user clicks the mouse
+        function handleMouseDown(e){
+            e.preventDefault();
+
+            ctx.clearRect(0,0, 300, 300);
+
+            // get the mouse position
+            var mouseX=parseInt(e.clientX-offsetX);
+            var mouseY=parseInt(e.clientY-offsetY);
+
+            // paint circle
+            ctx.beginPath();
+            ctx.arc(mouseX,mouseY,20,0,2*Math.PI);
+            ctx.stroke();
+        }
+
+    
+        // listen for mousedown events
+        $("#myCanvas").mousedown(function(e){handleMouseDown(e);});
+
+    }); // end $(function(){});
+</script>
+
+<canvas id="myCanvas" width=300 height=300></canvas>

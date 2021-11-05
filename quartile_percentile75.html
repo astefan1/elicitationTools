@@ -1,0 +1,171 @@
+<script type="text/javascript" src="https://code.jquery.com/jquery.min.js"></script>
+<style>
+    #quartiles{border:1px solid black;}
+</style>
+<script>
+
+    var coordXOnScale = null;
+
+    // Other variables
+    if(lowerBound == null){
+        var lowerBound = 2;
+    }
+    if(upperBound == null){
+        var upperBound = 3;
+    }
+    if(Median == null){
+        var Median = parseFloat(lowerBound) + (parseFloat(upperBound)-parseFloat(lowerBound))/2
+    }
+    if(Quart1 == null){
+        var Quart1 = parseFloat(lowerBound) + (parseFloat(Median)-parseFloat(lowerBound))/2
+    }
+
+    $(function(){
+
+        // Canvas variables
+        var canvas=document.getElementById("quartiles");
+        var ctx=canvas.getContext("2d");
+        var $canvas=$("#quartiles"); //dollar sign = document.getElementByID
+
+        // Helper functions
+
+        // convert scale values to canvas coordinates
+        function convertToPts(VAL){
+            var unitX = 0.8*window.innerWidth/100;
+            var res = (VAL-parseFloat(lowerBound))*(80*unitX)/(parseFloat(upperBound)-parseFloat(lowerBound))+10*unitX;
+            return(res);
+        }
+
+        // draw background to which the graphic reverts after something new is clicked
+        function drawBG(){
+
+            // canvas height and width
+            ctx.canvas.width  = 0.8*window.innerWidth;
+            ctx.canvas.height = 0.3*window.innerHeight;
+
+            // canvas size in screen-dependent units (change to actual rescale at some point?)
+            var unitX = 0.8*window.innerWidth/100;
+            var unitY = 0.3*window.innerHeight/100;
+
+            ctx.clearRect(0,0, 0.8*window.innerWidth, 0.3*window.innerHeight);
+
+            // horizontal axis
+            ctx.beginPath();
+            ctx.moveTo(10*unitX, 50*unitY);
+            ctx.lineTo(90*unitX, 50*unitY);
+            ctx.stroke();
+
+            // end points
+            ctx.beginPath();
+            ctx.moveTo(10*unitX, 54*unitY);
+            ctx.lineTo(10*unitX, 46*unitY);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(90*unitX, 54*unitY);
+            ctx.lineTo(90*unitX, 46*unitY);
+            ctx.stroke();
+
+            // lower and upper bound
+            ctx.font = '20px sans-serif';
+            ctx.fillText(lowerBound, 10*unitX, 65*unitY);
+            ctx.fillText(upperBound, 90*unitX, 65*unitY);
+
+            // median
+            ctx.beginPath();
+            ctx.strokeStyle = '#039dfc';
+            ctx.lineWidth = '8';
+            ctx.moveTo(convertToPts(Median), 58*unitY);
+            ctx.lineTo(convertToPts(Median), 42*unitY);
+            ctx.stroke();
+
+            // add tick mark label median
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#039dfc';
+            ctx.fillText(Median, convertToPts(Median), 65*unitY);
+
+            // first quartile
+            ctx.beginPath();
+            ctx.strokeStyle = '#936862';
+            ctx.lineWidth = '8';
+            ctx.moveTo(convertToPts(Quart1), 58*unitY);
+            ctx.lineTo(convertToPts(Quart1), 42*unitY);
+            ctx.stroke();
+
+            // add tick mark label quartile 1
+            ctx.fillStyle = '#936862';
+            ctx.fillText(Quart1, convertToPts(Quart1), 65*unitY);
+
+            // add grey background
+            ctx.fillStyle = 'rgba(220,220,220,0.4)';
+            ctx.fillRect(convertToPts(Median), 0*unitY, 100*unitX, 100*unitY);
+        }
+
+        // draw line with value on scale (this happens on click)
+        function drawVline(coordX){
+
+            var unitY = 0.3*window.innerHeight/100;
+            var unitX = 0.8*window.innerWidth/100;
+            coordXOnScale = (coordX-10*unitX)*((parseFloat(upperBound)-parseFloat(lowerBound))/(80*unitX))+parseFloat(lowerBound);
+
+            if(coordXOnScale < parseFloat(upperBound) && coordXOnScale > Median){
+
+                // add line (tick mark) at selected location
+                ctx.beginPath();
+                ctx.strokeStyle = '#936862';
+                ctx.lineWidth = '8';
+                ctx.moveTo(coordX, 58*unitY);
+                ctx.lineTo(coordX, 42*unitY);
+                ctx.stroke();
+
+                // add tick mark label
+                ctx.textAlign = 'center';
+                ctx.fillStyle = '#936862';
+                ctx.fillText(Math.round(coordXOnScale*100)/100, coordX, 65*unitY);
+
+                // store chosen value in session so that it can be called on next page
+                sessionStorage.setItem("Quart1", Math.round(coordXOnScale*100)/100);
+            }
+            
+        }
+        
+        // called when user clicks the mouse
+        function handleMouseDown(e){
+            e.preventDefault();
+            
+            // refresh background
+            drawBG();
+
+            // get the mouse position
+            var rect = canvas.getBoundingClientRect();
+            var mouseX = parseInt(e.clientX-rect.left);
+            var mouseY=parseInt(e.clientY-rect.top);
+
+            // paint new anchor on line
+            drawVline(mouseX);
+            
+            // send information to form input field
+            document.getElementById('PE09_01').value = coordXOnScale;
+            
+        }
+
+        // Initialize
+        drawBG();
+    
+        // listen for mousedown events
+        $("#quartiles").mousedown(function(e){handleMouseDown(e);});
+
+        // Store lower and upper bound in session
+        sessionStorage.setItem("lowerBound", lowerBound);
+        sessionStorage.setItem("upperBound", upperBound);
+
+    }); // end $(function(){});
+
+    
+</script>
+
+<p style="text-align: center;">
+<canvas id="quartiles"></canvas>
+</p>
+<!-- Hidden input field to save information and send it to questionnaire software-->
+<input type="hidden" id="PE09_01" name="PE09_01" value="">

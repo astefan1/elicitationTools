@@ -1,0 +1,147 @@
+<div style="text-align: center;">
+  <canvas id="intervals" style="border:1px solid #ffffff;"></canvas>
+</div>
+
+<script>
+  
+      // Define globals
+      var Percentage1 = 0;
+      var Percentage2 = 0;
+      var Percentage3 = 0;
+      var Percentage4 = 0;
+      var canvas = document.getElementById('intervals');
+      var ctx = canvas.getContext('2d');
+      if(lowerBound == null){
+          var lowerBound = 1;
+      }
+      if(upperBound == null){
+          var upperBound = 2;
+      }
+      var Int1 = parseFloat(lowerBound)+Math.round((parseFloat(upperBound) - parseFloat(lowerBound))*25)/100;
+      var Int2 = parseFloat(lowerBound)+Math.round((parseFloat(upperBound) - parseFloat(lowerBound))*50)/100;
+      var Int3 = parseFloat(lowerBound)+Math.round((parseFloat(upperBound) - parseFloat(lowerBound))*75)/100;
+  
+      // Helper functions
+  
+      function setPercentage1(){ 
+          if ((parseInt(this.value) + parseInt(Percentage2) + parseInt(Percentage3) + parseInt(Percentage4)) > 100){
+              alert("Make sure that the probabilities sum up to 100.");
+          } else {
+              Percentage1 = this.value;    
+              draw();
+          }
+      }
+  
+      function setPercentage2(){
+          if ((parseInt(this.value) + parseInt(Percentage1) + parseInt(Percentage3) + parseInt(Percentage4)) > 100){
+              alert("Make sure that the probabilities sum up to 100.");
+          } else {
+              Percentage2 = this.value;
+              draw();
+          }
+      }
+  
+      function setPercentage3(){
+          if ((parseInt(this.value) + parseInt(Percentage1) + parseInt(Percentage2) + parseInt(Percentage4)) > 100){
+              alert("Make sure that the probabilities sum up to 100.");
+          } else {
+              Percentage3 = this.value;
+              draw();
+          }
+      }
+  
+      function setPercentage4(){
+          if ((parseInt(this.value) + parseInt(Percentage1) + parseInt(Percentage2) + parseInt(Percentage3)) > 100){
+              alert("Make sure that the probabilities sum up to 100.");
+          } else {
+              Percentage4 = this.value;
+              draw();
+          }
+      }
+  
+      // Draw handler
+      function draw() {
+          if (canvas.getContext) {
+  
+            // canvas size in screen-dependent units (change to actual rescale at some point?)
+            var unitX = 0.8*window.innerWidth/100;
+            var unitY = 0.3*window.innerHeight/100;
+  
+            // canvas height and width
+            ctx.canvas.width  = 0.8*window.innerWidth;
+            ctx.canvas.height = 0.3*window.innerHeight;
+  
+            // horizontal axis
+            ctx.beginPath();
+            ctx.moveTo(10*unitX, 50*unitY);
+            ctx.lineTo(90*unitX, 50*unitY);
+            ctx.stroke();
+  
+            // vertical tick marks
+            for (var i = 0; i < 5; i++) {
+              ctx.beginPath();
+              ctx.moveTo(10*unitX + i*20*unitX, 54*unitY);
+              ctx.lineTo(10*unitX + i*20*unitX, 46*unitY);
+              ctx.stroke();
+            }
+  
+            // display percentages
+            ctx.font = 'bold 20px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(Percentage1+' %', 20*unitX, 40*unitY);
+            ctx.fillText(Percentage2+' %', 40*unitX, 40*unitY);
+            ctx.fillText(Percentage3+' %', 60*unitX, 40*unitY);
+            ctx.fillText(Percentage4+' %', 80*unitX, 40*unitY);
+  
+            // lower and upper bound
+            ctx.font = '20px sans-serif';
+            ctx.fillText(lowerBound, 10*unitX, 65*unitY);
+            ctx.fillText(upperBound, 90*unitX, 65*unitY);
+  
+            // interval borders
+            ctx.fillText(Math.round(Int1*100)/100, 30*unitX, 65*unitY);
+            ctx.fillText(Math.round(Int2*100)/100, 50*unitX, 65*unitY);
+            ctx.fillText(Math.round(Int3*100)/100, 70*unitX, 65*unitY);
+          
+            // sum percentages above
+            ctx.textAlign = 'left';
+            ctx.fillStyle = 'grey';
+            var sumPercentages = 100-(parseInt(Percentage1) + parseInt(Percentage2) + parseInt(Percentage3) + parseInt(Percentage4));
+            ctx.fillText('You have '+sumPercentages+'% left to distribute.', 1*unitX, 10*unitY);
+  
+            
+          }
+        }
+      
+      // Initialize
+      draw();
+  </script>
+  
+  <!-- Input handlers (HTML form) -->
+  <p>
+      <table style="width: 64%; margin-left: auto; margin-right: auto; font-family: sans-serif;">
+          <tr>
+              <th style="text-align:center">
+                  <label for="PE01_01">Probability Interval 1: </label> <br>
+                  <input type="number" id="PE01_01" name="PE01_01" value="0" min="0" max="100">
+                  <script>document.getElementsByName('PE01_01')[0].addEventListener('change', setPercentage1);</script>            
+              </th>
+              <th style="text-align:center">
+                  <label for="PE01_02">Probability Interval 2: </label> <br>
+                  <input type="number" id="PE01_02" name="PE01_02" value="0" min="0" max="100"> 
+                  <script>document.getElementsByName('PE01_02')[0].addEventListener('change', setPercentage2);</script>
+              </th>
+              <th style="text-align:center">
+                  <label for="PE01_03">Probability Interval 3: </label> <br>
+                  <input type="number" id="PE01_03" name="PE01_03" value="0" min="0" max="100"> 
+                  <script>document.getElementsByName('PE01_03')[0].addEventListener('change', setPercentage3);</script>
+              </th>
+              <th style="text-align:center">
+                  <label for="PE01_04">Probability Interval 4: </label> <br>
+                  <input type="number" id="PE01_04" name="PE01_04" value="0" min="0" max="100">
+                  <script>document.getElementsByName('PE01_04')[0].addEventListener('change', setPercentage4);</script>
+              </th>
+          </tr>
+      </table>
+  </p>
+  

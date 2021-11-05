@@ -1,0 +1,49 @@
+
+<canvas id="myCanvas" width="400" height="400" style="border:1px solid #000000;"></canvas>
+<script>
+       //Define globals
+   var radiusIncrement = 5;
+   var ballRadius = 20;
+   var canvas = document.getElementById('myCanvas');
+   var ctx = canvas.getContext('2d');
+   
+   //Helper functions
+   function increaseRadius() {
+     ballRadius += radiusIncrement;
+     draw();
+   }
+   
+   function decreaseRadius() {
+     if (ballRadius > 0) {
+       ballRadius -= radiusIncrement;
+       draw();
+     }
+   }
+
+   function setRadius(){
+        var ballRadius = this.value;
+        draw();
+      }
+   
+   //Draw handler
+   function draw() {
+     ctx.clearRect(0,0,canvas.width,canvas.height);
+     ctx.beginPath();
+     ctx.arc(canvas.height/2,canvas.width/2,ballRadius,0,2*Math.PI);
+     ctx.stroke();
+     alert(ballRadius);
+   }
+   
+   //initialize
+   draw();
+</script>
+
+<p>
+    <label for="setRadius">Set Radius: </label> <br>
+    <input type="text" id="setRadius" name="setRadius" value="0"> <br>
+    <script>document.getElementsByName('setRadius')[0].addEventListener('change', setRadius);</script>
+</p>
+
+
+<button type="button" onclick="increaseRadius()">Increase Radius</button>
+<button type="button" onclick="decreaseRadius()">Decrease Radius</button>

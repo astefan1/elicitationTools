@@ -1,0 +1,112 @@
+
+<script>
+    $(function(){
+    // Define globals
+    var canvas = document.getElementById('quartiles');
+    var ctx = canvas.getContext('2d');
+    if(lowerBound == null){
+        var lowerBound = 0;
+    }
+      if(upperBound == null){
+        var upperBound = 0.7;
+      }
+
+    // Helper functions
+
+    // draw a vertical line
+    function drawVline(coordX, unitX, unitY){
+        ctx.beginPath();
+        ctx.strokeStyle = '#FF0000';
+        ctx.lineWidth = '8';
+        ctx.moveTo(coordX*unitX, 58*unitY);
+        ctx.lineTo(coordX*unitX, 42*unitY);
+        ctx.stroke();
+    }
+
+    // define what happens on mouse click
+    function handleMouseDown(e){
+      e.preventDefault();
+
+      // get the mouse position
+      var mouseX=parseInt(e.clientX-offsetX);
+      var mouseY=parseInt(e.clientY-offsetY);
+      
+      ctx.beginPath();
+      ctx.arc(mouseX,mouseY,20,0,2*Math.PI);
+      ctx.stroke();
+
+      // iterate each shape in the shapes array
+      //for(var i=0;i<shapes.length;i++){
+        //  var shape=shapes[i];
+          // define the current shape
+          //define(shape);
+          // test if the mouse is in the current shape
+          //if(ctx.isPointInPath(mouseX,mouseY)){
+              // if inside, display the shape's message
+          //    alert(shape.message);
+          //}
+      //}
+
+    }
+
+    // Draw handler
+    function draw(){
+        if (canvas.getContext) {
+
+            // canvas size in screen-dependent units (change to actual rescale at some point?)
+            var unitX = 0.8*window.innerWidth/100;
+            var unitY = 0.3*window.innerHeight/100;
+
+            // canvas height and width
+            ctx.canvas.width  = 0.8*window.innerWidth;
+            ctx.canvas.height = 0.3*window.innerHeight;
+
+            // other canvas variables
+            var $canvas=$("#quartiles"); //dollar sign = document.getElementByID
+            var canvasOffset=$canvas.offset();
+            var offsetX=canvasOffset.left;
+            var offsetY=canvasOffset.top;
+            var scrollX=$canvas.scrollLeft();
+            var scrollY=$canvas.scrollTop();
+
+
+            // horizontal axis
+            ctx.beginPath();
+            ctx.moveTo(10*unitX, 50*unitY);
+            ctx.lineTo(90*unitX, 50*unitY);
+            ctx.stroke();
+
+            // end points
+            ctx.beginPath();
+            ctx.moveTo(10*unitX, 54*unitY);
+            ctx.lineTo(10*unitX, 46*unitY);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(90*unitX, 54*unitY);
+            ctx.lineTo(90*unitX, 46*unitY);
+            ctx.stroke();
+
+            // lower and upper bound
+            ctx.font = '20px sans-serif';
+            ctx.fillText(lowerBound, 10*unitX, 65*unitY);
+            ctx.fillText(upperBound, 90*unitX, 65*unitY);
+
+            // draw quantile
+            drawVline(50, unitX, unitY);
+
+        }
+
+    }
+
+    // Initialize
+    draw();
+
+    // listen for mousedown events
+    $("#quartiles").mousedown(function(e){handleMouseDown(e);});
+}); // end $(function(){});
+</script>
+
+<div style="text-align: center;">
+    <canvas id="quartiles" style="border:1px solid #000000;"></canvas>
+</div>

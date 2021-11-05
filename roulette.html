@@ -1,0 +1,290 @@
+<!-- <img src="https://cdn-icons-png.flaticon.com/512/845/845664.png" alt="coin"> --> 
+
+<script type="text/javascript" src="https://code.jquery.com/jquery.min.js"></script>
+
+<style>
+    #roulette{border:1px solid black;}
+</style>
+<script>
+
+    var isFirstClick = 1;
+
+    // coin image
+    var coinImage = new Image();
+    coinImage.src = 'https://cdn-icons-png.flaticon.com/512/845/845664.png';
+    
+    // Other variables
+    if(lowerBound == null){
+        var lowerBound = 2;
+    }
+    if(upperBound == null){
+        var upperBound = 3;
+    }
+    var binWidth = null;
+    var binBorders = Array(12);
+    var unitX = null;
+    var unitY = null;
+    var nCoins = [0,0,0,0,0,0,0,0,0,0];
+    var coinsLeft = 20;
+
+    $(function(){
+
+        // Canvas variables
+        var canvas=document.getElementById("roulette");
+        var ctx=canvas.getContext("2d");
+        var $canvas=$("#roulette"); //dollar sign = document.getElementByID
+
+        // Helper functions
+        
+        // convert scale values to canvas coordinates
+        function convertToPts(VAL){
+            var res = (VAL-parseFloat(lowerBound))*(65*unitX)/(parseFloat(upperBound)-parseFloat(lowerBound))+30*unitX;
+            return(res);
+        }
+
+        // draw a line
+        function drawLine(x1, y1, x2, y2){
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+        }
+
+        // draw plus button
+        function drawPlusButton(binNumber){
+            drawPlus(
+                convertToPts(parseFloat(lowerBound)+(0.5+(binNumber-1))*binWidth),
+                80*unitY,
+                convertToPts(parseFloat(lowerBound)+binNumber*binWidth)-3,
+                88*unitY,
+                convertToPts(parseFloat(lowerBound)+(binNumber-1)*binWidth)+3
+            );           
+        }
+
+        function drawPlus(xUp, yUp, xLow1, yLow, xLow2){
+            // triangle button
+            ctx.fillStyle = '#444444';
+            ctx.beginPath();
+            ctx.moveTo(xUp, yUp);
+            ctx.lineTo(xLow1, yLow);
+            ctx.lineTo(xLow2, yLow);
+            ctx.fill();
+            // plus sign
+            ctx.closePath();
+            ctx.textAlign = 'center';
+            ctx.fillStyle = 'white';
+            ctx.font = '20px sans-serif';
+            ctx.fillText("+", xUp, yUp+5*unitY);
+        }
+        
+        // draw minus button
+        function drawMinusButton(binNumber){
+            drawMinus(
+                convertToPts(parseFloat(lowerBound)+(0.5+(binNumber-1))*binWidth),
+                98*unitY, 
+                convertToPts(parseFloat(lowerBound)+binNumber*binWidth)-3, 
+                90*unitY, 
+                convertToPts(parseFloat(lowerBound)+(binNumber-1)*binWidth)+3
+                );
+        }
+
+        function drawMinus(xLow, yLow, x1Up, yUp, x2Up){
+            // triangle button
+            ctx.fillStyle = '#999999';
+            ctx.beginPath();
+            ctx.moveTo(xLow, yLow);
+            ctx.lineTo(x1Up, yUp);
+            ctx.lineTo(x2Up, yUp);
+            ctx.fill();
+            // plus sign
+            ctx.closePath();
+            ctx.textAlign = 'center';
+            ctx.fillStyle = 'white';
+            ctx.font = '26px sans-serif';
+            ctx.fillText("-", xLow, yUp+4*unitY);
+        }
+
+        // draw background to which the graphic reverts after something new is clicked
+        function drawBG(){
+
+            // canvas height and width
+            ctx.canvas.width  = 0.8*window.innerWidth;
+            ctx.canvas.height = 0.6*window.innerHeight;
+
+            // canvas size in screen-dependent units (change to actual rescale at some point?)
+            unitX = 0.8*window.innerWidth/100;
+            unitY = 0.6*window.innerHeight/100;
+
+            ctx.clearRect(0,0, 0.8*window.innerWidth, 0.6*window.innerHeight);
+
+            // horizontal axis
+            drawLine(30*unitX, 75*unitY, 95*unitX, 75*unitY)
+
+            // instructions and coin counter on the left
+            if(isFirstClick == 1){ //first show instructions
+                ctx.font = '20px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('Click on', 15*unitX, 15*unitY);
+                ctx.fillText('to add a coin.', 15*unitX, 30*unitY);
+                ctx.fillText('Click on', 15*unitX, 45*unitY);
+                ctx.fillText('to remove a coin.', 15*unitX, 60*unitY);
+                drawMinus(15*unitX, 55*unitY, 12*unitX, 47*unitY, 18*unitX);
+                drawPlus(15*unitX, 17*unitY, 12*unitX, 25*unitY, 18*unitX);
+                ctx.drawImage(coinImage, 10*unitX, 50*unitY, 6.3*unitX, 6.3*unitX); // this won't show but needs to be there to load the coin picture
+                isFirstClick = 0;
+                
+            } else { //then show coin counter
+                coinsLeft = 20-nCoins.reduce((a, b) => a + b, 0);
+                ctx.font = '20px sans-serif';
+                ctx.textAlign = 'left';
+                if(coinsLeft > 0){      
+                    ctx.drawImage(coinImage, 5*unitX, 30*unitY, 6*unitX, 6*unitX);
+                    ctx.fillText('You have '+coinsLeft+' coins left.', 5*unitX, 50*unitY);
+
+                } else {
+                    ctx.fillText('You have no coins left.', 5*unitX, 50*unitY);
+                }
+            }
+            
+            // bins
+            binWidth = (parseFloat(upperBound)-parseFloat(lowerBound))*0.1;
+            binBorders = [
+                Math.round(parseFloat(lowerBound)*1000)/1000, 
+                Math.round((parseFloat(lowerBound)+binWidth)*1000)/1000, 
+                Math.round((parseFloat(lowerBound)+2*binWidth)*1000)/1000, 
+                Math.round((parseFloat(lowerBound)+3*binWidth)*1000)/1000,
+                Math.round((parseFloat(lowerBound)+4*binWidth)*1000)/1000,
+                Math.round((parseFloat(lowerBound)+5*binWidth)*1000)/1000,
+                Math.round((parseFloat(lowerBound)+6*binWidth)*1000)/1000,
+                Math.round((parseFloat(lowerBound)+7*binWidth)*1000)/1000,
+                Math.round((parseFloat(lowerBound)+8*binWidth)*1000)/1000,
+                Math.round((parseFloat(lowerBound)+9*binWidth)*1000)/1000,
+                Math.round((parseFloat(lowerBound)+10*binWidth)*1000)/1000,
+                Math.round((parseFloat(lowerBound)+11*binWidth)*1000)/1000,
+            ];
+
+            for(var i=0; i<12; i++){
+                drawLine(convertToPts(binBorders[i]), 5*unitY, convertToPts(binBorders[i]), 75*unitY);
+                ctx.font = '16px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillStyle = 'black';
+                ctx.fillText(binBorders[i], convertToPts(binBorders[i]), 78*unitY);
+            }
+
+            // buttons (just the visuals, functionality see below)          
+            for(var i=1; i<11; i++){
+                drawPlusButton(i);
+            }
+            for(var i=1; i<11; i++){
+                drawMinusButton(i);
+            }
+            
+            // draw existing coins
+            for(var i=1; i<11; i++){ // for each bin i
+                var coinSize = 3.5*unitX;
+                var NCoinsInBin = nCoins[i-1];
+                for(var j=0; j<NCoinsInBin+1; j++){ // draw as many coins as indicated in nCoins
+                    if(j == 1){ // this ensures that lower end of coin stack is aligned with horizontal line 
+                        ctx.drawImage(
+                            coinImage, 
+                            convertToPts(binBorders[i-1]+0.5*binWidth)-0.5*coinSize, 
+                            75*unitY-j*coinSize, 
+                            coinSize, 
+                            coinSize
+                            );
+                    } 
+                    if(j > 1){
+                        ctx.drawImage(
+                            coinImage, 
+                            convertToPts(binBorders[i-1]+0.5*binWidth)-0.5*coinSize, 
+                            75*unitY-j*0.8*coinSize, 
+                            coinSize, 
+                            coinSize
+                            );
+                    }
+                }
+            }          
+        }
+
+        // this happens on click
+        function addCoin(coordX, coordY){
+            for(var i=1; i<11; i++){
+                if(coordX > convertToPts(binBorders[(i-1)]) && coordX < convertToPts(binBorders[i]) && coordY > 80*unitY && coordY < 88*unitY && coinsLeft > 0){
+                    nCoins[i-1] = nCoins[i-1]+1;
+                }
+            }                    
+        }
+
+        function removeCoin(coordX, coordY){
+            for(var i=1; i<11; i++){
+                if(coordX > convertToPts(binBorders[(i-1)]) && coordX < convertToPts(binBorders[i]) && coordY > 90*unitY && coordY < 98*unitY){
+                    nCoins[i-1] = Math.max(nCoins[i-1]-1, 0);
+                }
+            }
+        }
+        
+        // called when user clicks the mouse
+        function handleMouseDown(e){
+            e.preventDefault();
+            
+            // refresh background
+            drawBG();
+
+            // get the mouse position
+            var rect = canvas.getBoundingClientRect();
+            var mouseX = parseInt(e.clientX-rect.left);
+            var mouseY=parseInt(e.clientY-rect.top);
+
+            // add or remove coins based on mouse click
+            addCoin(mouseX, mouseY);
+            removeCoin(mouseX, mouseY);
+
+            // draw new background
+            drawBG();
+            
+            // save assigned coins in form
+            document.getElementById('PE11_01').value = nCoins[0];
+            document.getElementById('PE11_02').value = nCoins[1];
+            document.getElementById('PE11_03').value = nCoins[2];
+            document.getElementById('PE11_04').value = nCoins[3];
+            document.getElementById('PE11_05').value = nCoins[4];
+            document.getElementById('PE11_06').value = nCoins[5];
+            document.getElementById('PE11_07').value = nCoins[6];
+            document.getElementById('PE11_08').value = nCoins[7];
+            document.getElementById('PE11_09').value = nCoins[8];
+            document.getElementById('PE11_10').value = nCoins[9];
+
+            
+        }
+
+        // Initialize
+        drawBG();
+    
+        // listen for mousedown events
+        $("#roulette").mousedown(function(e){handleMouseDown(e);});
+
+        // Store lower and upper bound in session
+        sessionStorage.setItem("roulette", lowerBound);
+        sessionStorage.setItem("roulette", upperBound);
+
+    }); // end $(function(){});
+
+    
+</script>
+
+<p style="text-align: center;">
+<canvas id="roulette"></canvas>
+</p>
+
+<!-- Hidden input field to save information and send it to questionnaire software-->
+<input type="hidden" id="PE11_01" name="PE11_01" value="">
+<input type="hidden" id="PE11_02" name="PE11_02" value="">
+<input type="hidden" id="PE11_03" name="PE11_03" value="">
+<input type="hidden" id="PE11_04" name="PE11_04" value="">
+<input type="hidden" id="PE11_05" name="PE11_05" value="">
+<input type="hidden" id="PE11_06" name="PE11_06" value="">
+<input type="hidden" id="PE11_07" name="PE11_07" value="">
+<input type="hidden" id="PE11_08" name="PE11_08" value="">
+<input type="hidden" id="PE11_09" name="PE11_09" value="">
+<input type="hidden" id="PE11_10" name="PE11_10" value="">
+
