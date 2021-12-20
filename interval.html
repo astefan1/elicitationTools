@@ -122,23 +122,27 @@
       <table style="width: 64%; margin-left: auto; margin-right: auto; font-family: sans-serif;">
           <tr>
               <th style="text-align:center">
-                  <label for="PE01_01">Probability Interval 1: </label> <br>
-                  <input type="number" id="PE01_01" name="PE01_01" value="0" min="0" max="100">
+                  <label for="PE01_01">Probability Interval 1: </label> <br> 
+                  <input type="number" id="PE01_01" name="PE01_01" value="0" min="0" max="100" step="0.1"
+                  oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"> %
                   <script>document.getElementsByName('PE01_01')[0].addEventListener('change', setPercentage1);</script>            
               </th>
               <th style="text-align:center">
                   <label for="PE01_02">Probability Interval 2: </label> <br>
-                  <input type="number" id="PE01_02" name="PE01_02" value="0" min="0" max="100"> 
+                  <input type="number" id="PE01_02" name="PE01_02" value="0" min="0" max="100" step="0.1"
+                  oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"> %
                   <script>document.getElementsByName('PE01_02')[0].addEventListener('change', setPercentage2);</script>
               </th>
               <th style="text-align:center">
                   <label for="PE01_03">Probability Interval 3: </label> <br>
-                  <input type="number" id="PE01_03" name="PE01_03" value="0" min="0" max="100"> 
+                  <input type="number" id="PE01_03" name="PE01_03" value="0" min="0" max="100" step="0.1"
+                  oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"> %
                   <script>document.getElementsByName('PE01_03')[0].addEventListener('change', setPercentage3);</script>
               </th>
               <th style="text-align:center">
                   <label for="PE01_04">Probability Interval 4: </label> <br>
-                  <input type="number" id="PE01_04" name="PE01_04" value="0" min="0" max="100">
+                  <input type="number" id="PE01_04" name="PE01_04" value="0" min="0" max="100" step="0.1"
+                  oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"> %
                   <script>document.getElementsByName('PE01_04')[0].addEventListener('change', setPercentage4);</script>
               </th>
           </tr>
